@@ -11,7 +11,7 @@ test('renders a number input with a label "Favorite Number"', () => {
 
 describe('when the number input is invalid', () => {
   test('displays an error message', () => {
-    render(<FavoriteNumber />)
+    const {rerender} = render(<FavoriteNumber />)
     const input = screen.getByLabelText(/favorite number/i)
 
     userEvent.type(input, '10')
@@ -19,5 +19,12 @@ describe('when the number input is invalid', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       /the number is invalid/i,
     )
+
+    rerender(<FavoriteNumber />)
+
+    userEvent.clear(input)
+    userEvent.type(input, '9')
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })
