@@ -20,10 +20,7 @@ describe('when the number input is invalid', () => {
       /the number is invalid/i,
     )
 
-    rerender(<FavoriteNumber />)
-
-    userEvent.clear(input)
-    userEvent.type(input, '9')
+    rerender(<FavoriteNumber max={14} />)
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
