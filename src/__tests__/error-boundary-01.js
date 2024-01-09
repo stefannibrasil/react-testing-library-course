@@ -5,6 +5,14 @@ import {ErrorBoundary} from '../error-boundary'
 
 jest.mock('../api')
 
+beforeAll(() => {
+  jest.spyOn(console, 'error')
+})
+
+afterAll(() => {
+  jest.restoreAllMocks()
+})
+
 afterEach(() => {
   jest.clearAllMocks()
 })
@@ -39,6 +47,7 @@ test('calls reportError and displays a try again message', () => {
   expect(mockReportError).toHaveBeenCalledWith(error, info)
   expect(mockReportError).toHaveBeenCalledTimes(1)
   expect(screen.getByRole('alert')).toHaveTextContent(/There was a problem/i)
+  expect(console.error).toHaveBeenCalledTimes(2)
 })
 
 // this is only here to make the error output not appear in the project's output
