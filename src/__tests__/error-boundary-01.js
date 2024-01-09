@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {render} from '@testing-library/react'
+import {screen, render} from '@testing-library/react'
 import {reportError as mockReportError} from '../api'
 import {ErrorBoundary} from '../error-boundary'
 
@@ -17,13 +17,16 @@ function Bomb({shouldThrow}) {
   }
 }
 
-test('calls reportError and renders that there was a problem', () => {
+test('calls reportError and displays a try again message', () => {
   mockReportError.mockResolvedValueOnce({success: true})
   const {rerender} = render(
     <ErrorBoundary>
       <Bomb />
     </ErrorBoundary>,
   )
+
+  expect(mockReportError).not.toHaveBeenCalled()
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 
   rerender(
     <ErrorBoundary>
@@ -35,6 +38,7 @@ test('calls reportError and renders that there was a problem', () => {
   const info = {componentStack: expect.stringContaining('Bomb')}
   expect(mockReportError).toHaveBeenCalledWith(error, info)
   expect(mockReportError).toHaveBeenCalledTimes(1)
+  expect(screen.getByRole('alert')).toHaveTextContent(/There was a problem/i)
 })
 
 // this is only here to make the error output not appear in the project's output
