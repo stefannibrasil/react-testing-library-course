@@ -27,20 +27,12 @@ function Bomb({shouldThrow}) {
 
 test('calls reportError and displays a try again message', () => {
   mockReportError.mockResolvedValueOnce({success: true})
-  const {rerender} = render(
-    <ErrorBoundary>
-      <Bomb />
-    </ErrorBoundary>,
-  )
+  const {rerender} = render(<Bomb />, {wrapper: ErrorBoundary})
 
   expect(mockReportError).not.toHaveBeenCalled()
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 
-  rerender(
-    <ErrorBoundary>
-      <Bomb shouldThrow={true} />
-    </ErrorBoundary>,
-  )
+  rerender(<Bomb shouldThrow={true} />)
 
   const error = expect.any(Error)
   const info = {componentStack: expect.stringContaining('Bomb')}
@@ -54,11 +46,7 @@ test('calls reportError and displays a try again message', () => {
   console.error.mockClear()
   mockReportError.mockClear()
 
-  rerender(
-    <ErrorBoundary>
-      <Bomb />
-    </ErrorBoundary>,
-  )
+  rerender(<Bomb />)
 
   fireEvent.click(screen.getByText(/try again/i))
 
