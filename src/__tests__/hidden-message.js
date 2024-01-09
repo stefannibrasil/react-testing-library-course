@@ -1,8 +1,14 @@
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import {HiddenMessage} from '../hidden-message'
 
-test('shows hidden message when toggle is clicked', async () => {
+jest.mock('react-transition-group', () => {
+  return {
+    CSSTransition: (props) => (props.in ? props.children : null),
+  }
+})
+
+test('shows hidden message when toggle is clicked', () => {
   const myMessage = 'meow'
   render(<HiddenMessage>{myMessage}</HiddenMessage>)
   const toggleButton = screen.getByText(/toggle/i)
@@ -15,7 +21,5 @@ test('shows hidden message when toggle is clicked', async () => {
 
   fireEvent.click(toggleButton)
 
-  await waitFor(() =>
-    expect(screen.queryByText(myMessage)).not.toBeInTheDocument(),
-  )
+  expect(screen.queryByText(myMessage)).not.toBeInTheDocument()
 })
