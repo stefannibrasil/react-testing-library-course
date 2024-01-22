@@ -18,6 +18,7 @@ test('renders a form with title, content, tags, and a submit button', () => {
     content: 'This is about cats',
     tags: ['cat1', 'cat2'],
   }
+  const preDate = new Date().getTime()
   screen.getByLabelText(/title/i).value = fakePost.title
   screen.getByLabelText(/content/i).value = fakePost.content
   screen.getByLabelText(/tags/i).value = fakePost.tags
@@ -31,8 +32,14 @@ test('renders a form with title, content, tags, and a submit button', () => {
   expect(mockSavePost).toHaveBeenCalledWith({
     ...fakePost,
     authorId: fakeUser.id,
+    date: expect.any(String),
   })
   expect(mockSavePost).toHaveBeenCalledTimes(1)
+  const postDate = new Date().getTime()
+  const date = new Date(mockSavePost.mock.calls[0][0].date).getTime()
+
+  expect(date).toBeGreaterThanOrEqual(preDate)
+  expect(date).toBeLessThanOrEqual(postDate)
 })
 
 // disabling this rule for now. We'll get to this later
