@@ -6,13 +6,14 @@ function Editor({user}) {
   function handleSubmit(e) {
     e.preventDefault()
     const {title, content, tags} = e.target.elements
-    setIsSaving(true)
-    savePost({
+    const newPost = {
       title: title.value,
       content: content.value,
       tags: tags.value.split(',').map((t) => t.trim()),
       authorId: user.id,
-    })
+    }
+    savePost(newPost)
+    setIsSaving(true)
   }
 
   return (
