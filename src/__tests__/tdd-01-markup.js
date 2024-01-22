@@ -1,10 +1,16 @@
 import * as React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
+import {build, fake, sequence} from 'test-data-bot'
 import {Editor} from '../post-editor-01-markup'
 import {savePost as mockSavePost} from '../api'
-import {build, fake, sequence} from 'test-data-bot'
 
 jest.mock('../api')
+
+jest.mock('react-router', () => {
+  return {
+    Redirect: jest.fn(() => null),
+  }
+})
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -47,6 +53,21 @@ test('renders a form with title, content, tags, and a submit button', () => {
 
   expect(date).toBeGreaterThanOrEqual(preDate)
   expect(date).toBeLessThanOrEqual(postDate)
+})
+
+test('renders the error message from the server', async () => {
+  const testError = 'meow error'
+  mockSavePost.mockRejectedValueOnce({data: {error: testError}})
+  const fakeUser = userBuilder()
+  render(<Editor user={fakeUser} />)
+  const submitButton = screen.getByText(/submit/i)
+
+  fireEvent.click(submitButton)
+
+  const postError = await screen.findByRole('alert')
+
+  expect(postError).toHaveTextContent(testError)
+  expect(submitButton).toBeEnabled()
 })
 
 // disabling this rule for now. We'll get to this later
