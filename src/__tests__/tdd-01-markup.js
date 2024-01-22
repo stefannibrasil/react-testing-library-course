@@ -2,6 +2,7 @@ import * as React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import {Editor} from '../post-editor-01-markup'
 import {savePost as mockSavePost} from '../api'
+import {build, fake, sequence} from 'test-data-bot'
 
 jest.mock('../api')
 
@@ -9,15 +10,21 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
+const postBuilder = build('Post').fields({
+  title: fake((f) => f.lorem.words()),
+  content: fake((f) => f.lorem.paragraphs().replace(/\r/g, '')),
+  tags: fake((f) => [f.lorem.word(), f.lorem.word()]),
+})
+
+const userBuilder = build('User').fields({
+  id: sequence((s) => `user-${s}`),
+})
+
 test('renders a form with title, content, tags, and a submit button', () => {
   mockSavePost.mockResolvedValueOnce()
-  const fakeUser = {id: 'user-1'}
+  const fakeUser = userBuilder()
   render(<Editor user={fakeUser} />)
-  const fakePost = {
-    title: 'Hello Cats',
-    content: 'This is about cats',
-    tags: ['cat1', 'cat2'],
-  }
+  const fakePost = postBuilder()
   const preDate = new Date().getTime()
   screen.getByLabelText(/title/i).value = fakePost.title
   screen.getByLabelText(/content/i).value = fakePost.content
