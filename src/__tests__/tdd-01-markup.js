@@ -26,17 +26,28 @@ const userBuilder = build('User').fields({
   id: sequence((s) => `user-${s}`),
 })
 
-test('renders a form with title, content, tags, and a submit button', () => {
-  mockSavePost.mockResolvedValueOnce()
+function renderEditor() {
   const fakeUser = userBuilder()
   render(<Editor user={fakeUser} />)
   const fakePost = postBuilder()
-  const preDate = new Date().getTime()
   screen.getByLabelText(/title/i).value = fakePost.title
   screen.getByLabelText(/content/i).value = fakePost.content
   screen.getByLabelText(/tags/i).value = fakePost.tags
   screen.getByText(/submit/i)
   const submitButton = screen.getByText(/submit/i)
+
+  return {
+    submitButton,
+    fakeUser,
+    fakePost,
+  }
+}
+
+test('renders a form with title, content, tags, and a submit button', () => {
+  mockSavePost.mockResolvedValueOnce()
+  const preDate = new Date().getTime()
+
+  const {submitButton, fakePost, fakeUser} = renderEditor()
 
   fireEvent.click(submitButton)
 
@@ -58,9 +69,8 @@ test('renders a form with title, content, tags, and a submit button', () => {
 test('renders the error message from the server', async () => {
   const testError = 'meow error'
   mockSavePost.mockRejectedValueOnce({data: {error: testError}})
-  const fakeUser = userBuilder()
-  render(<Editor user={fakeUser} />)
-  const submitButton = screen.getByText(/submit/i)
+
+  const {submitButton} = renderEditor()
 
   fireEvent.click(submitButton)
 
