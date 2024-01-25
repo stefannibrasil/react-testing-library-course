@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {act, fireEvent, render, screen} from '@testing-library/react'
 import {build, fake, sequence} from 'test-data-bot'
 import {Editor} from '../post-editor-01-markup'
 import {savePost as mockSavePost} from '../api'
@@ -43,7 +43,9 @@ function renderEditor() {
   }
 }
 
-test('renders a form with title, content, tags, and a submit button', () => {
+test('renders a form with title, content, tags, and a submit button', async () => {
+  const promise = Promise.resolve()
+  jest.fn(() => promise)
   mockSavePost.mockResolvedValueOnce()
   const preDate = new Date().getTime()
 
@@ -64,6 +66,10 @@ test('renders a form with title, content, tags, and a submit button', () => {
 
   expect(date).toBeGreaterThanOrEqual(preDate)
   expect(date).toBeLessThanOrEqual(postDate)
+
+  await act(async () => {
+    await promise
+  })
 })
 
 test('renders the error message from the server', async () => {
